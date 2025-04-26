@@ -1,39 +1,37 @@
 package database
 
 import (
-    "database/sql"
-    "fmt"
-    "log"
-    "os"
+	"fmt"
+	"log"
+	"os"
 
-    "github.com/joho/godotenv"
-    _ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"github.com/joho/godotenv"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func Konek() {
-    if err := godotenv.Load(); err != nil {
-        log.Fatal("Error loading .env file")
-    }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("error env file")
+	}
 
-    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-        os.Getenv("DB_USER"),
-        os.Getenv("DB_PASS"),
-        os.Getenv("DB_HOST"),
-        os.Getenv("DB_PORT"),
-        os.Getenv("DB_NAME"),
-    )
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
 
-    var err error
-    DB, err = sql.Open("mysql", dsn)
-    if err != nil {
-        log.Fatalf("error konek: %v", err)
-    }
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("gagal: ", err)
+	}
 
-    if err = DB.Ping(); err != nil {
-        log.Fatalf("ga dijangkau: %v", err)
-    }
+	DB = db
 
-    log.Println("konek")
+	log.Println("konek!")
 }
