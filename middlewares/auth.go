@@ -7,21 +7,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"sekolah-be/database"
+	"sekolah-be/models"
+	"sekolah-be/utils"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header tidak ditemukan"})
+			utils.ErrorResponse(c, http.StatusUnauthorized, "authorization header tidak ditemukan")
 			c.Abort()
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header tidak valid"})
+			utils.ErrorResponse(c, http.StatusUnauthorized, "authorization header tidak valid")
 			c.Abort()
 			return
 		}
@@ -30,13 +32,12 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT secret tidak tersedia"})
+			utils.ErrorResponse(c, http.StatusInternalServerError, "jwt secret tidak tersedia")
 			c.Abort()
 			return
 		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
 			}
@@ -44,13 +45,21 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak valid"})
+			utils.ErrorResponse(c, http.StatusUnauthorized, "token tidak valid")
+			c.Abort()
+			return
+		}
+
+		var session models.Session
+		if err := database.DB.Where("token = ?", tokenString).First(&session).Error; err != nil {
+			utils.ErrorResponse(c, http.StatusUnauthorized, "sesi login tidak ditemukan atau sudah logout")
 			c.Abort()
 			return
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user", claims)
+			c.Set("tokenString", tokenString) 
 		}
 
 		c.Next()

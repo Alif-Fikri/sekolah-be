@@ -18,7 +18,7 @@ func RegisterTeacher(c *gin.Context) {
 		return
 	}
 
-	if err := validators.EmailUnique(input.Email); err != nil {
+	if err := validators.ValidateEmail(input.Email); err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -34,15 +34,21 @@ func RegisterTeacher(c *gin.Context) {
 		return
 	}
 
+	if err := validators.ValidateNIK(input.NIK); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	teacher := models.Teacher{
-		Name:         input.Name,
-		Email:        input.Email,
-		Password:     hashedPassword,
-		NIDN:         input.NIDN,
-		SchoolName:   input.SchoolName,
-		SchoolLevel:  input.SchoolLevel,
-		IsSLB:        input.IsSLB,
-		Role:         "guru",
+		Name:        input.Name,
+		Email:       input.Email,
+		Password:    hashedPassword,
+		NIK:         input.NIK,
+		NUPTK:       input.NUPTK,
+		SchoolName:  input.SchoolName,
+		SchoolLevel: input.SchoolLevel,
+		IsSLB:       input.IsSLB,
+		Role:        "guru",
 	}
 
 	if err := database.DB.Create(&teacher).Error; err != nil {

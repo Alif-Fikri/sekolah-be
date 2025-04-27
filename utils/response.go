@@ -12,6 +12,9 @@ func ErrorResponse(c *gin.Context, code int, message string) {
 }
 
 func SuccessResponse(c *gin.Context, code int, message string, data interface{}) {
+	if data == nil {
+		data = gin.H{}
+	}
 	c.JSON(code, gin.H{
 		"success": true,
 		"message": message,

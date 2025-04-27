@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func LoginTeacher(c *gin.Context) {
 	var input validators.LoginGuruRequest
 
@@ -37,8 +36,17 @@ func LoginTeacher(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Berhasil login",
-		"token":   tokenString,
+	session := models.Session{
+		TeacherID: teacher.ID,
+		Token:     tokenString,
+		Role:      teacher.Role,
+	}
+	if err := database.DB.Create(&session).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal menyimpan sesi login")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Berhasil login", gin.H{
+		"token": tokenString,
 	})
 }
