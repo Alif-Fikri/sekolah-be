@@ -6,12 +6,13 @@ import (
 	"sekolah-be/models"
 	"sekolah-be/utils"
 	"sekolah-be/validators"
+	"sekolah-be/requests"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterTeacher(c *gin.Context) {
-	var input validators.RegisterGuruRequest
+	var input requests.RegisterGuruRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, "data registrasi tidak valid: "+err.Error())

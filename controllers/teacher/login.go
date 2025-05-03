@@ -6,13 +6,12 @@ import (
 	"sekolah-be/database"
 	"sekolah-be/models"
 	"sekolah-be/utils"
-	"sekolah-be/validators"
-
+	"sekolah-be/requests"
 	"github.com/gin-gonic/gin"
 )
 
 func LoginTeacher(c *gin.Context) {
-	var input validators.LoginGuruRequest
+	var input requests.LoginGuruRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, "data login tidak valid: "+err.Error())
