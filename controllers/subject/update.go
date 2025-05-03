@@ -41,5 +41,10 @@ func UpdateSubject(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.Preload("CreatedBy").First(&subject, subject.ID).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal memuat data subject setelah update")
+		return
+	}
+
 	utils.SuccessResponse(c, http.StatusOK, "berhasil update subject", subject)
 }

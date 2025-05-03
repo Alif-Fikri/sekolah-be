@@ -40,7 +40,7 @@ func GetAllSubjects(c *gin.Context) {
 	createdBy := uint(claims["user_id"].(float64))
 
 	var subjects []models.Subject
-	if err := database.DB.Where("created_by_id = ?", createdBy).Find(&subjects).Error; err != nil {
+	if err := database.DB.Preload("CreatedBy").Where("created_by_id = ?", createdBy).Find(&subjects).Error; err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal mengambil data subject")
 		return
 	}

@@ -33,5 +33,10 @@ func CreateSubject(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.Preload("CreatedBy").First(&subject, subject.ID).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal mengambil subject yang baru dibuat")
+		return
+	}
+
 	utils.SuccessResponse(c, http.StatusOK, "berhasil membuat subject", subject)
 }

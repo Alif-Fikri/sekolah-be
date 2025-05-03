@@ -42,5 +42,10 @@ func UpdateClass(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.Preload("GuruPengampu").First(&class, class.ID).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal mengambil data class setelah update")
+		return
+	}
+
 	utils.SuccessResponse(c, http.StatusOK, "berhasil update class", class)
 }
