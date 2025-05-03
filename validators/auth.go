@@ -5,24 +5,9 @@ import (
 	"regexp"
 	"sekolah-be/database"
 	"sekolah-be/models"
+	"sekolah-be/requests"
 	"strings"
 )
-
-type RegisterGuruRequest struct {
-	Name        string `json:"name" binding:"required"`
-	Email       string `json:"email" binding:"required,email"`
-	Password    string `json:"password" binding:"required,min=6"`
-	NIK         string `json:"nik" binding:"required,len=16,numeric"`
-	NUPTK       string `json:"nuptk"`
-	SchoolName  string `json:"school_name"`
-	SchoolLevel string `json:"school_level" binding:"required,oneof=SD SMP SMA"`
-	IsSLB       bool   `json:"is_slb"`
-}
-
-type LoginGuruRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
 
 func ValidateEmail(email string) error {
 	var teacher models.Teacher
@@ -52,7 +37,7 @@ func ValidatePassword(password string) error {
 	return nil
 }
 
-func ValidateLoginInput(input LoginGuruRequest) error {
+func ValidateLoginInput(input requests.RegisterGuruRequest) error {
 	if input.Email == "" {
 		return errors.New("email wajib diisi")
 	}
