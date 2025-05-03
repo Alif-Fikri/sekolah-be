@@ -40,7 +40,10 @@ func GetAllClasses(c *gin.Context) {
 	guruID := uint(user["user_id"].(float64))
 
 	var classes []models.Class
-	if err := database.DB.Where("guru_pengampu_id = ?", guruID).Find(&classes).Error; err != nil {
+	if err := database.DB.
+		Preload("GuruPengampu").
+		Where("guru_pengampu_id = ?", guruID).
+		Find(&classes).Error; err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal mengambil data class")
 		return
 	}

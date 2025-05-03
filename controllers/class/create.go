@@ -33,5 +33,10 @@ func CreateClass(c *gin.Context) {
 		return
 	}
 
+	if err := database.DB.Preload("GuruPengampu").First(&class, class.ID).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "gagal memuat data class setelah create")
+		return
+	}
+
 	utils.SuccessResponse(c, http.StatusOK, "berhasil membuat class", class)
 }
