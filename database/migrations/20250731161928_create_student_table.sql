@@ -3,16 +3,13 @@
 CREATE TABLE students (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    nisn VARCHAR(20) UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    school_level ENUM('SD','SMP','SMA'),
-    is_slb BOOLEAN DEFAULT FALSE,
-    birth_place VARCHAR(100),
     birth_date DATE,
-    gender ENUM('L','P'),
+    gender BOOLEAN,
     address TEXT,
-    email VARCHAR(100) UNIQUE,
+    email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(20),
+    password TEXT NOT NULL,
+    teacher_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
