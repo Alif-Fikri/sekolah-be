@@ -1,11 +1,13 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
-	teacherController "sekolah-be/controllers/teacher"
 	classController "sekolah-be/controllers/class"
+	studentController "sekolah-be/controllers/student"
 	subjectController "sekolah-be/controllers/subject"
+	teacherController "sekolah-be/controllers/teacher"
 	"sekolah-be/middlewares"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Api(r *gin.Engine) {
@@ -34,5 +36,17 @@ func Api(r *gin.Engine) {
 		class.GET("/:id", classController.GetClassByID)
 		class.PUT("/:id", classController.UpdateClass)
 		class.DELETE("/:id", classController.DeleteClass)
+	}
+
+	student := r.Group("/student")
+	{
+		student.POST("/login", studentController.LoginStudent)
+		student.POST("/logout", studentController.LogoutStudent)
+
+		studentCreate := student.Group("/", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
+		{
+			studentCreate.POST("/register", studentController.RegisterStudent)
+			studentCreate.POST("/import", studentController.ImportStudents)
+		}
 	}
 }

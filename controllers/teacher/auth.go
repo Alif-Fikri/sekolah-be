@@ -37,7 +37,7 @@ func LoginTeacher(c *gin.Context) {
 	}
 
 	session := models.Session{
-		TeacherID: teacher.ID,
+		TeacherID: &teacher.ID,
 		Token:     tokenString,
 		Role:      teacher.Role,
 	}
