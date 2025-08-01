@@ -4,7 +4,8 @@ import "time"
 
 type Session struct {
 	ID        uint       `gorm:"primaryKey" json:"id"`
-	TeacherID uint       `gorm:"not null" json:"teacher_id"`
+	TeacherID *uint      `json:"teacher_id,omitempty"`
+	StudentID *uint      `json:"student_id,omitempty"`
 	Token     string     `gorm:"type:varchar(512);unique;not null" json:"token"`
 	Role      string     `gorm:"type:enum('guru','siswa');not null" json:"role"`
 	CreatedAt time.Time  `json:"created_at"`
