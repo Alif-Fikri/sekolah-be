@@ -66,6 +66,24 @@ CREATE TABLE classes (
     FOREIGN KEY (guru_pengampu_id) REFERENCES teachers(id) ON DELETE SET NULL
 );
 
+CREATE TABLE class_students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_id INT NOT NULL,
+    student_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+CREATE TABLE subject_students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    student_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
 -- +goose Down
 
 DROP TABLE IF EXISTS classes;
@@ -73,4 +91,6 @@ DROP TABLE IF EXISTS subjects;
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS teachers;
+DROP TABLE IF EXISTS subject_students;
+DROP TABLE IF EXISTS class_students;
 

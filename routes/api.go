@@ -27,6 +27,7 @@ func Api(r *gin.Engine) {
 		subject.GET("/:id", subjectController.GetSubjectByID)
 		subject.PUT("/:id", subjectController.UpdateSubject)
 		subject.DELETE("/:id", subjectController.DeleteSubject)
+		subject.POST("/assign-student", subjectController.AssignStudentsToSubject)
 	}
 
 	class := r.Group("/class", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
@@ -36,6 +37,7 @@ func Api(r *gin.Engine) {
 		class.GET("/:id", classController.GetClassByID)
 		class.PUT("/:id", classController.UpdateClass)
 		class.DELETE("/:id", classController.DeleteClass)
+		class.POST("/assign-student", classController.AssignStudentsToClass)
 	}
 
 	student := r.Group("/student")
