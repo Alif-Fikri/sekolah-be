@@ -1,6 +1,7 @@
 package routes
 
 import (
+	attendanceController "sekolah-be/controllers/attendance"
 	classController "sekolah-be/controllers/class"
 	studentController "sekolah-be/controllers/student"
 	subjectController "sekolah-be/controllers/subject"
@@ -50,5 +51,12 @@ func Api(r *gin.Engine) {
 			studentCreate.POST("/register", studentController.RegisterStudent)
 			studentCreate.POST("/import", studentController.ImportStudents)
 		}
+	}
+
+	attendance := r.Group("/attendance")
+	{
+		attendance.POST("/class", attendanceController.CreateClassAttendance)
+		attendance.POST("/subject", attendanceController.CreateSubjectAttendance)
+		attendance.POST("/exportcsv", attendanceController.ExportAttendanceCSV)
 	}
 }
