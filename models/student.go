@@ -13,10 +13,11 @@ type Student struct {
 	IsSLB       bool
 	BirthPlace  string `gorm:"size:100"`
 	BirthDate   time.Time
-	Gender      string     `gorm:"type:ENUM('L','P')"`
-	Address     string     `gorm:"type:text"`
-	Email       string     `gorm:"size:100;unique"`
-	Phone       string     `gorm:"size:20"`
+	Gender      string `gorm:"type:ENUM('L','P')"`
+	Address     string `gorm:"type:text"`
+	Email       string `gorm:"size:100;unique"`
+	Phone       string `gorm:"size:20"`
+	CreatedBy   *uint
 	Classes     []*Class   `gorm:"many2many:class_students;"`
 	Subjects    []*Subject `gorm:"many2many:subject_students;"`
 	CreatedAt   time.Time

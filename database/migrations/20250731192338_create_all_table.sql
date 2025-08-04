@@ -28,8 +28,10 @@ CREATE TABLE students (
     address TEXT,
     email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
+    created_by INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\
+    FOREIGN KEY (created_by) REFERENCES teachers(id) ON DELETE SET NULL
 );
 
 CREATE TABLE sessions (

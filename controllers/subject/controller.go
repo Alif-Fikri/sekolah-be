@@ -11,15 +11,15 @@ import (
 )
 
 func AssignStudentsToSubject(c *gin.Context) {
-	var req requests.AssignStudentToClassRequest
+	var req requests.AssignStudentToSubjectRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, "Data tidak valid")
 		return
 	}
 
-	var class models.Class
-	if err := database.DB.First(&class, req.ClassID).Error; err != nil {
-		utils.ErrorResponse(c, http.StatusNotFound, "Kelas tidak ditemukan")
+	var class models.Subject
+	if err := database.DB.First(&class, req.SubjectID).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusNotFound, "Mata pelajaran tidak ditemukan")
 		return
 	}
 
@@ -34,5 +34,5 @@ func AssignStudentsToSubject(c *gin.Context) {
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusOK, "Siswa berhasil ditambahkan ke kelas", nil)
+	utils.SuccessResponse(c, http.StatusOK, "Siswa berhasil ditambahkan ke mata pelajaran", nil)
 }

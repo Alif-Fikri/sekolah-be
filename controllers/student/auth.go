@@ -13,6 +13,7 @@ import (
 	"sekolah-be/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -77,6 +78,9 @@ func RegisterStudent(c *gin.Context) {
 		return
 	}
 
+	user := c.MustGet("user").(jwt.MapClaims)
+	teacherID := uint(user["user_id"].(float64))
+
 	student := models.Student{
 		Name:        input.Name,
 		NISN:        input.NISN,
@@ -89,6 +93,7 @@ func RegisterStudent(c *gin.Context) {
 		Address:     input.Address,
 		Email:       input.Email,
 		Phone:       input.Phone,
+		CreatedBy:   &teacherID,
 	}
 
 	if err := database.DB.Create(&student).Error; err != nil {
@@ -102,25 +107,25 @@ func RegisterStudent(c *gin.Context) {
 }
 
 func LogoutStudent(c *gin.Context) {
-    authHeader := c.GetHeader("Authorization")
-    if authHeader == "" {
-        utils.ErrorResponse(c, http.StatusUnauthorized, "Authorization header required")
-        return
-    }
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Authorization header required")
+		return
+	}
 
-    tokenParts := strings.Split(authHeader, " ")
-    if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
-        utils.ErrorResponse(c, http.StatusUnauthorized, "Invalid token format")
-        return
-    }
-    tokenString := tokenParts[1]
+	tokenParts := strings.Split(authHeader, " ")
+	if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Invalid token format")
+		return
+	}
+	tokenString := tokenParts[1]
 
-    if err := database.DB.Where("token = ?", tokenString).Delete(&models.Session{}).Error; err != nil {
-        utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to logout")
-        return
-    }
+	if err := database.DB.Where("token = ?", tokenString).Delete(&models.Session{}).Error; err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to logout")
+		return
+	}
 
-    utils.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
+	utils.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 
 func ImportStudents(c *gin.Context) {
@@ -163,6 +168,9 @@ func ImportStudents(c *gin.Context) {
 			continue
 		}
 
+		user := c.MustGet("user").(jwt.MapClaims)
+		teacherID := uint(user["user_id"].(float64))
+
 		isSLB, _ := strconv.ParseBool(row[3])
 
 		student := models.Student{
@@ -177,6 +185,7 @@ func ImportStudents(c *gin.Context) {
 			Address:     row[7],
 			Email:       row[8],
 			Phone:       row[9],
+			CreatedBy: &teacherID,
 		}
 
 		database.DB.Create(&student)
