@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"sekolah-be/database"
@@ -14,48 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func LoginStudent(c *gin.Context) {
-	var input requests.LoginStudentRequest
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Data login tidak valid: "+err.Error())
-		return
-	}
-
-	var student models.Student
-	if err := database.DB.Where("name = ?", input.Name).First(&student).Error; err != nil {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Nama siswa tidak ditemukan")
-		return
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(student.Password), []byte(input.Password)); err != nil {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Password salah")
-		return
-	}
-
-	tokenString, err := utils.GenerateToken(student.ID, "siswa")
-	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal membuat token")
-		return
-	}
-
-	session := models.Session{
-		StudentID: &student.ID,
-		Token:     tokenString,
-		Role:      "siswa",
-	}
-	if err := database.DB.Create(&session).Error; err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal menyimpan sesi login")
-		return
-	}
-
-	utils.SuccessResponse(c, http.StatusOK, "Login berhasil", gin.H{
-		"token": tokenString,
-	})
-}
 
 func RegisterStudent(c *gin.Context) {
 	var input requests.RegisterStudentRequest
@@ -104,28 +62,6 @@ func RegisterStudent(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "siswa berhasil didaftarkan", gin.H{
 		"password_awal": passwordRaw,
 	})
-}
-
-func LogoutStudent(c *gin.Context) {
-	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Authorization header required")
-		return
-	}
-
-	tokenParts := strings.Split(authHeader, " ")
-	if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Invalid token format")
-		return
-	}
-	tokenString := tokenParts[1]
-
-	if err := database.DB.Where("token = ?", tokenString).Delete(&models.Session{}).Error; err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to logout")
-		return
-	}
-
-	utils.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 
 func ImportStudents(c *gin.Context) {

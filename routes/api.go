@@ -2,6 +2,7 @@ package routes
 
 import (
 	attendanceController "sekolah-be/controllers/attendance"
+	authController "sekolah-be/controllers/auth"
 	classController "sekolah-be/controllers/class"
 	studentController "sekolah-be/controllers/student"
 	subjectController "sekolah-be/controllers/subject"
@@ -12,16 +13,19 @@ import (
 )
 
 func Api(r *gin.Engine) {
-	guru := r.Group("/guru")
+
+	api := r.Group("/api")
+	api.POST("/login", authController.Login)
+	api.POST("/logout", authController.Logout)
+
+	guru := api.Group("/guru")
 	{
 		guru.POST("/register", teacherController.RegisterTeacher)
-		guru.POST("/login", teacherController.LoginTeacher)
-		guru.POST("/logout", middlewares.AuthMiddleware(), teacherController.LogoutTeacher)
 		guru.GET("/:id", middlewares.AuthMiddleware(), teacherController.GetTeacherByID)
 		guru.GET("/all", middlewares.AuthMiddleware(), teacherController.GetAllTeachers)
 	}
 
-	subject := r.Group("/subject", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
+	subject := api.Group("/subject", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
 	{
 		subject.POST("/", subjectController.CreateSubject)
 		subject.GET("/", subjectController.GetAllSubjects)
@@ -31,7 +35,7 @@ func Api(r *gin.Engine) {
 		subject.POST("/assign-student", subjectController.AssignStudentsToSubject)
 	}
 
-	class := r.Group("/class", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
+	class := api.Group("/class", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
 	{
 		class.POST("/", classController.CreateClass)
 		class.GET("/", classController.GetAllClasses)
@@ -41,11 +45,8 @@ func Api(r *gin.Engine) {
 		class.POST("/assign-student", classController.AssignStudentsToClass)
 	}
 
-	student := r.Group("/student")
+	student := api.Group("/student")
 	{
-		student.POST("/login", studentController.LoginStudent)
-		student.POST("/logout", studentController.LogoutStudent)
-
 		studentCreate := student.Group("/", middlewares.AuthMiddleware(), middlewares.RoleMiddleware("guru"))
 		{
 			studentCreate.POST("/register", studentController.RegisterStudent)
@@ -53,7 +54,7 @@ func Api(r *gin.Engine) {
 		}
 	}
 
-	attendance := r.Group("/attendance")
+	attendance := api.Group("/attendance")
 	{
 		attendance.POST("/class", attendanceController.CreateClassAttendance)
 		attendance.POST("/subject", attendanceController.CreateSubjectAttendance)

@@ -6,7 +6,7 @@ type RegisterGuruRequest struct {
 	Password    string `json:"password" binding:"required,min=6"`
 	NIK         string `json:"nik" binding:"required,len=16,numeric"`
 	NUPTK       string `json:"nuptk"`
-	SchoolName  string `json:"school_name"`
-	SchoolLevel string `json:"school_level" binding:"required,oneof=SD SMP SMA"`
+	SchoolName  string `json:"schoolName"`
+	SchoolLevel string `json:"schoolLevel" binding:"required,oneof=SD SMP SMA"`
 	IsSLB       bool   `json:"is_slb"`
 }
